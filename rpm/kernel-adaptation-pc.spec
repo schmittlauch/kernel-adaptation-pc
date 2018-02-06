@@ -56,6 +56,8 @@ mkdir -p %{buildroot}/boot/
 make INSTALL_PATH=%{buildroot}/boot/ install
 
 install -m 755 arch/%{kernel_arch}/boot/bzImage %{buildroot}/boot/vmlinuz-%{kernel_version_build}
+# We dont need the vmlinuz package itself.
+rm -f %{buildroot}/boot/vmlinuz
 
 install -m 755 .config %{buildroot}/boot/config-%{kernel_version_build}
 install -m 755 System.map %{buildroot}/boot/
@@ -114,7 +116,7 @@ touch -r %{buildroot}/%{kernel_devel_dir}/.config %{buildroot}/%{kernel_devel_di
 cp %{buildroot}/%{kernel_devel_dir}/.config %{buildroot}/%{kernel_devel_dir}/include/config/auto.conf
 
 %post
-depmod -a %{kernel_version_build}
+depmod -a %{kernel_version_build} || :
 /sbin/new-kernel-pkg --package kernel-adaptation-pc --mkinitrd --depmod --install %{kernel_version_build} || exit $?\
 
 %files
